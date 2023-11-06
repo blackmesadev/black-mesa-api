@@ -1,0 +1,42 @@
+version: '3.7'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: black-mesa-api
+    restart: unless-stopped
+    links:
+      - mongo
+      - redis
+    depends_on:
+      - mongo
+      - redis
+    environment:
+      - DISCORD_CLIENT_ID=
+      - DISCORD_CLIENT_SECRET=
+      - MONGO_URI=mongodb://root:REPLACE_ME@mongo:27017
+      - REDIS_URI=redis://redis:6739
+      - JWT_SECRET=AWESOME_SECRET_THAT_YOU_SHOULD_REPLACE
+    ports:
+      - 8080:8080
+
+  mongo:
+    image: mongo
+    restart: unless-stopped
+    volumes:
+      - ./data/mongodb:/data/db
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=REPLACE_ME
+
+  redis:
+    image: redis
+    restart: unless-stopped
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - 6739:6739

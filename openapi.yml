@@ -1,0 +1,176 @@
+openapi: 3.1.0
+info:
+  title: Black Mesa Public API v1
+  description: |-
+    This is the Black Mesa Public API. You can find out more about Black Mesa at [blackmesa.bot](https://blackmesa.bot).
+  version: 1.0.0
+  termsOfService: http://blackmesa.dev/terms/
+  contact:
+    email: tyler@blackmesa.bot
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit/
+externalDocs:
+  description: Black Mesa Website
+  url: https://blackmesa.bot/
+servers:
+  - url: https://blackmesa.bot/api/v1
+tags:
+  - name: guilds
+    description: Guild Configuration and Information
+  - name: appeals
+    description: Manage and view appeals as a User and an Admin
+paths:
+  /guilds:
+    get:
+      tags:
+        - guilds
+      summary: Get a list of Guilds the User is in
+      description: Get a list of guilds that are mutual with the bot
+      operationId: get_guild_list
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Guilds'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Guilds'
+        '404':
+          description: No guilds found
+      security:
+        - token: []
+
+  /guild/{guild_id}:
+    get:
+      tags:
+        - guilds
+      summary: Get the Configuration for a Guild
+      description: Get the Configuration for a Guild
+      operationId: get_guild_config
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          description: Invalid request
+        '404':
+          description: Guild not found
+      security:
+        - token: []
+
+    post:
+      tags:
+        - guilds
+      summary: New Guild Configuration
+      description: Set a new Guild Configuration.
+      operationId: new_guild_config
+      responses:
+        '201':
+          description: Successful operation
+        '400':
+          description: Invalid request
+        '404':
+          description: Guild not found
+        '409':
+          description: Guild already exists
+      security:
+        - token: []
+
+    patch:
+      tags:
+        - guilds
+      summary: Update Guild Configuration
+      description: |-
+        Update a Guild Configuration. This allows for partial updates.
+        Omit fields you wish not to update, to remove a field, set it to null.
+      operationId: update_guild_config
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Config'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          description: Invalid request
+        '404':
+          description: Guild not found
+      security:
+        - token: []
+
+    delete:
+      tags:
+        - guilds
+      summary: Delete Guild Configuration
+      description: Delete a Guild Configuration.
+      operationId: delete_guild_config
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Invalid request
+        '404':
+          description: Guild not found
+      security:
+        - token: []
+
+components:
+  securitySchemes:
+    token:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      name: Authorization
+      in: header
+
+  schemas:
+    Guilds:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the guild
+          examples: ['832311430019022848']
+        icon:
+          type: string
+          description: The icon hash of the guild
+          examples: ['389030ec9db118cb5b85a732333b7c98']
+
+    Config:
+      type: object
+      properties:
+        prefix:
+          type: string
+          description: The prefix for the guild
+          examples: ['!']
+        users:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/User'
+          examples: ['{}']
+
+    User:
+      type: object
+      properties:
+        groups:
+          type: array
+          items:
+            type: string
+        permissions:
+          type: array
+          items:
+            type: string
